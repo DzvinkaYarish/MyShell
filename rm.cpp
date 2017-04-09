@@ -9,33 +9,80 @@
 
 using namespace std;
 using namespace boost::filesystem;
+
+path concat(path pp, char c[])
+{
+    pp += "/";
+    for (int i = 0; i < strlen(c); i++)
+    {
+        pp += c[i];
+    }
+    return pp;
+}
+
 int main(int argc, char *argv[])
 {
-    string userInput;
-    for (int i = 2; i < argc; i++) {
-        if (is_directory((path)argv[i]) && argv[1] == "false")
+
+
+    bool f = false;
+    bool R = false;
+
+    for (int i  = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-f") == 0)
         {
+            f = true;
+        } else if (strcmp(argv[i], "-R") == 0)
+        {
+            R = true;
+
+        }
+    }
+
+
+
+    for (int i = 1; i < argc; i++) {
+        string userInput;
+        if (strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "-R") == 0)
+       {
+           continue;
+       }
+
+        if (is_directory((path)argv[i]) && !R)
+        {
+            cout << "Is a directory" << endl;
             continue;
         }
-        if (argv[0] == "false")
+        if (!f)
         {
             cout << "Do you want to delete " << argv[i] << "?y/n"<< endl;
             getline(cin, userInput);
             if (userInput == "y")
             {
-                remove(argv[i]);
+                try {
+                    remove_all((path) argv[i]);
+                } catch (boost::filesystem::filesystem_error)
+                {
+                    remove_all(concat(current_path(), argv[i]));
+                }
             }
         } else {
+            try
+            {
             remove(argv[i]);
+            } catch (boost::filesystem::filesystem_error)
+            {
+                remove_all(concat(current_path(), argv[i]));
+            }
         }
         if (!errno) {
-            cout << "no error in rm" << endl;
+            //cout << "no error in rm" << endl;
             continue;
         } else {
+            if(errno != 21)
             cout << "rm: " << strerror(errno) << endl;
             errno = 0;
             continue;
-
         }
     }
     return 0;

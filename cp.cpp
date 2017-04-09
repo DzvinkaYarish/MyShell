@@ -1,15 +1,10 @@
-//
-// Created by dzvinka on 02.04.17.
-//
 #include <iostream>
 #include <cstring>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-
 using namespace std;
-//using namespace boost::filesystem;
-
+using namespace boost::filesystem;
 
 boost::filesystem::path concat(boost::filesystem::path pp, char c[])
 {
@@ -21,8 +16,8 @@ boost::filesystem::path concat(boost::filesystem::path pp, char c[])
     return pp;
 }
 
-int main(int argc, char *argv[]) {
-
+int main(int argc, char *argv[])
+{
     errno = 0;
     string userInput;
     bool f = false;
@@ -72,18 +67,28 @@ int main(int argc, char *argv[]) {
                 getline(cin, userInput);
                 if (userInput == "y") {
                     errno = 0;
-                    rename(argv[i], newName.c_str());
+                    try {
+                        copy_file(argv[i], newName.c_str(), copy_option::overwrite_if_exists);
+                    } catch (boost::filesystem::filesystem_error){
+                        cout << "cp: no such file or directory" << endl;
+                        continue;
+                    }
                 }
             } else
             {
                 errno = 0;
-                rename(argv[i], newName.c_str());
+                try {
+                    copy_file(argv[i], newName.c_str(), copy_option::overwrite_if_exists);
+                }  catch (boost::filesystem::filesystem_error){
+                    cout << "cp: no such file or directory" << endl;
+                    continue;
+                }
             }
             if (!errno) {
                 //cout << "no error in mv" << endl;
                 continue;
             } else {
-                cout << "mv: " << strerror(errno) << endl;
+                cout << "cp: " << strerror(errno) << endl;
                 errno = 0;
                 continue;
             }
@@ -117,18 +122,26 @@ int main(int argc, char *argv[]) {
             getline(cin, userInput);
             if (userInput == "y") {
                 errno = 0;
-                rename(argv[indxofsrc], argv[indxofdest]);
+                try {
+                    copy_file(argv[indxofsrc], argv[indxofdest], copy_option::overwrite_if_exists);
+                } catch (boost::filesystem::filesystem_error){
+                    cout << "cp: no such file or directory" << endl;
+                }
             }
         } else {
             errno = 0;
-            rename(argv[indxofsrc], argv[indxofdest]);
+            try {
+                copy_file(argv[indxofsrc], argv[indxofdest], copy_option::overwrite_if_exists);
+            }  catch (boost::filesystem::filesystem_error){
+                cout << "cp: no such file or directory" << endl;
+            }
 
         }
         if (!errno) {
-            //cout << "no error in mv" << endl;
+            cout << "no error in mv" << endl;
             return 0;
         } else {
-            cout << "mv: " << strerror(errno) << endl;
+            cout << "cp: " << strerror(errno) << endl;
             errno = 0;
             return -1;
         }
@@ -136,4 +149,3 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-

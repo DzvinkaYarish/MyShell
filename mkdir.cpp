@@ -12,10 +12,10 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-cout << argv[0] << endl;
-mkdir(argv[0], S_IRWXU);
+//cout << argv[0] << endl;
+mkdir(argv[1], S_IRWXU);
     if (!errno) {
-        cout << "no error here" << endl;
+        //cout << "no error here" << endl;
         return 0;
     } else
     {
