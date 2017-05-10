@@ -5,7 +5,9 @@
 #include <wait.h>
 #include "callOuterCommands.h"
 #include "innerCommands.h"
-#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
+//! USE at least "export PATH=$PATH:`pwd`" or getenv()/setenv()
+//#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
+#define EXEC_PATH ""
 
 int callOuter(std::vector<std::string> args)
 {
@@ -54,6 +56,7 @@ int startNewProcess(char * args[])
         execvp(args[0],  args);
         //execvp("/home/dzvinka/CLionProjects/MyShell/cmake-build/debug/rm", args);
         std::cout << strerror(errno) << std::endl;
+		exit(-1); //! УВАГА! Раз вже процес не вдалося запустити, то може дочірній варто зупинити? ;-)
     } else if (childPid < 0)
     {
         std::cout << "balblasjdkfg" << std::endl;
