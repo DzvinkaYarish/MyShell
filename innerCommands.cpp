@@ -22,6 +22,9 @@ int cd(std::vector<std::string> args)
         return 0;
     } else if (args[1] == "..")
     {
+		chdir(args[1].data());
+		return 0;
+#if 0		
         //! boost::filesystem::path currentDir  = get_current_dir_name();
 		//! УВАГА! 1. get_current_dir_name() -- нестандартна.
 		//! 	   2. Пам'ять вона виділяє malloc(), а після того, що Ви
@@ -30,13 +33,18 @@ int cd(std::vector<std::string> args)
         std::vector<std::string> splitVec;
         std::string oneDirUp;
         boost::split(splitVec, currentDir.string(), boost::is_any_of("/"), boost::token_compress_on);
+		//! У вихідному варіанті -- на моїй системі висло...
+		//! Anyway, boost та chdir() розуміють ".." -- можна було не ускладнювати собі життя.
+		//! Працює завдяки тому, що в кожній директорії є директорія-backlink, з іменем "..".
+		//! Див. також http://www.boost.org/doc/libs/1_51_0/libs/filesystem/doc/reference.html#canonical
         for (int i = 0; i < splitVec.size() - 1; i++) {
-            oneDirUp += "/";
             oneDirUp += splitVec[i];
+            oneDirUp += "/";
         }
         chdir(oneDirUp.c_str());
-        currentDir = my_get_current_dir_name();
+        // currentDir = my_get_current_dir_name();
         return 0;
+#endif		
     } else if (args[1] == "/")
     {
         chdir("/");
