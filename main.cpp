@@ -1,6 +1,7 @@
 #include <boost/lambda/lambda.hpp>
 #include "callOuterCommands.h"
 #include "innerCommands.h"
+#include "sh_tools.h"
 #include <fstream>
 
 //#include <map>
@@ -64,7 +65,8 @@ int main()
     string userInput;
     vector<string> splitVec;
     while (1) {
-        cout << get_current_dir_name() << "$ ";
+		//! УВАГА -- див. комент до get_current_dir_name() в innerCommands.cpp 
+        cout << my_get_current_dir_name() << "$ "; 
         getline(cin, userInput);
 
         boost::split(splitVec, userInput, boost::is_any_of(" "), boost::token_compress_on);
