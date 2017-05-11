@@ -51,16 +51,11 @@ bool cmpExtens(const fileinfo &a, const fileinfo &b)
     return (a.extens < b.extens);
 }
 
-path concat(path pp, char c[])
+path concat(path pp, const char c[])
 {
-    pp += "/";
-    for (int i = 0; i < strlen(c); i++)
-    {
-        pp += c[i];
-    }
-    return pp;
+	pp /= c;
+	return c;
 }
-
 
 
 int main(int argc, char *argv[])
