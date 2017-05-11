@@ -75,6 +75,10 @@ int main(int argc, char *argv[])
                 remove_all(concat(current_path(), argv[i]));
             }
         }
+		//! errno є сенс перевіряти лише зразу після виклику, що повернув помилку.
+		//! От так його перевіряти осоливого сенсу немає -- функції не зобов'язані
+		//! зануляти errno.
+		//! Те ж стосується mkdir
         if (!errno) {
             //cout << "no error in rm" << endl;
             continue;

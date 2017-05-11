@@ -12,15 +12,15 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-//cout << argv[0] << endl;
-mkdir(argv[1], S_IRWXU);
-    if (!errno) {
+	//cout << argv[0] << endl;
+	int res = mkdir(argv[1], S_IRWXU);
+    if (!res) {
         //cout << "no error here" << endl;
         return 0;
     } else
     {
         cout << "mkdir: " << strerror(errno) << endl;
-	errno = 0;
+		errno = 0;
         return -1;
     }
 
