@@ -60,6 +60,7 @@ path concat(path pp, const char c[])
 
 int main(int argc, char *argv[])
 {
+    cout << "myls" << endl;
     cmpMap["sort=N"] = &cmpName;
     cmpMap["sort=S"] = &cmpSize;
     cmpMap["sort=t"] = &cmpDate;
