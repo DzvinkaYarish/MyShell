@@ -3,7 +3,7 @@
 #include "innerCommands.h"
 #include "sh_tools.h"
 #include <fstream>
-
+#include <iostream>
 //#include <map>
 
 //using namespace boost::filesystem;
@@ -35,7 +35,7 @@ int readScript(vector<string> args)
     while (getline(fin, line)) {
         cout << line << endl;
         vector<string> splitVec;
-        boost::split(splitVec, line, boost::is_any_of(" "), boost::token_compress_on);
+        boost::split(splitVec, line, boost::is_space(), boost::token_compress_on);
         if (splitVec[0] == "exit") {
             break;
         }
