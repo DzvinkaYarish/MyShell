@@ -15,7 +15,7 @@ map<string, commandToExec> commandMap;
 
 
 
-int executeCommand(commandToExec commnd, vector<string> args)
+int executeCommand(commandToExec commnd, vector<string> &args)
 {
     return commnd(args);
 
@@ -34,15 +34,22 @@ int readScript(vector<string> args)
 
     while (getline(fin, line)) {
         cout << line << endl;
-        vector<string> splitVec;
+        vector<string> splitVec, splitVecWithoutComments;
         boost::split(splitVec, line, boost::is_space(), boost::token_compress_on);
-        if (splitVec[0] == "exit") {
-            break;
+        for (string s: splitVec) {
+            if (boost::starts_with(s, "#")) {
+                break;
+            }
+            splitVecWithoutComments.push_back(s);
         }
-        else if (commandMap.find(splitVec[0]) != commandMap.end()) {
-            executeCommand(commandMap[splitVec[0]], splitVec);
-        } else {
-            cout << splitVec[0] << ": command not found" << endl;
+        if(!splitVecWithoutComments.empty()) {
+            if (splitVecWithoutComments[0] == "exit") {
+                break;
+            } else if (commandMap.find(splitVecWithoutComments[0]) != commandMap.end()) {
+                executeCommand(commandMap[splitVecWithoutComments[0]], splitVecWithoutComments);
+            } else {
+                cout << splitVec[0] << ": command not found" << endl;
+            }
         }
     }
     return 0;
@@ -63,21 +70,32 @@ int main()
     commandMap["cp"] = &callOuter;
     commandMap["myshell"] = &readScript;
     string userInput;
-    vector<string> splitVec;
+
+
     while (1) {
+        vector<string> splitVec, splitVecWithoutComments;
 		//! УВАГА -- див. комент до get_current_dir_name() в innerCommands.cpp 
-        cout << my_get_current_dir_name() << "$ "; 
+        cout << my_get_current_dir_name() << "$ ";
         getline(cin, userInput);
+        if(!userInput.empty()) {
+            boost::split(splitVec, userInput, boost::is_any_of(" "), boost::token_compress_on);
+            for (string s: splitVec) {
+                if (boost::starts_with(s, "#")) {
+                    break;
+                }
+                splitVecWithoutComments.push_back(s);
+            }
+            if (!splitVecWithoutComments.empty()) {
+                if (splitVecWithoutComments[0] == "exit") {
+                    break;
+                } else {
+                    if (commandMap.find(splitVecWithoutComments[0]) != commandMap.end()) {
 
-        boost::split(splitVec, userInput, boost::is_any_of(" "), boost::token_compress_on);
-        if (splitVec[0] == "exit") {
-            break;
-        } else {
-            if (commandMap.find(splitVec[0]) != commandMap.end()) {
-
-                executeCommand(commandMap[splitVec[0]], splitVec);
-            } else {
-                cout << splitVec[0] << ": command not found" << endl;
+                        executeCommand(commandMap[splitVecWithoutComments[0]], splitVecWithoutComments);
+                    } else {
+                        cout << splitVecWithoutComments[0] << ": command not found" << endl;
+                    }
+                }
             }
         }
     }

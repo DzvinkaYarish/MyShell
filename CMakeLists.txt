@@ -8,7 +8,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-set(SOURCE_FILES main.cpp callOuterCommands.cpp callOuterCommands.h innerCommands.cpp innerCommands.h)
+set(SOURCE_FILES main.cpp callOuterCommands.cpp callOuterCommands.h innerCommands.cpp innerCommands.h sh_tools.cpp sh_tools.h)
 set(SOURCE_FILES_COPY cp.cpp)
 set(SOURCE_FILES_MKDIR mkdir.cpp)
 set(SOURCE_FILES_RM rm.cpp)

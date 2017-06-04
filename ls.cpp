@@ -51,16 +51,20 @@ bool cmpExtens(const fileinfo &a, const fileinfo &b)
     return (a.extens < b.extens);
 }
 
-path concat(path pp, const char c[])
+path concat(path pp, char c[])
 {
-	pp /= c;
-	return c;
+    pp += "/";
+    for (int i = 0; i < strlen(c); i++)
+    {
+        pp += c[i];
+    }
+    return pp;
 }
+
 
 
 int main(int argc, char *argv[])
 {
-    cout << "myls" << endl;
     cmpMap["sort=N"] = &cmpName;
     cmpMap["sort=S"] = &cmpSize;
     cmpMap["sort=t"] = &cmpDate;
@@ -69,9 +73,10 @@ int main(int argc, char *argv[])
 
     bool l = false;
     bool r = false;
+    bool redirect = false;
+    vector<string> redirctOptions;
     string sortm = "sort=N";
-    string charmask = "*";
-    basic_regex<char> mask = regex(charmask);
+    string charmask("*");
 
 
     path p = "./";
@@ -95,15 +100,17 @@ int main(int argc, char *argv[])
         } else
         {
             charmask = argv[i];
-            mask = regex(charmask);
+
         }
     }
 
+
     vector<fileinfo> filenames;
+
 
     DIR *dpdf;
     struct dirent *epdf;
-   ;
+    cout << "myls1" << endl;
     dpdf = opendir(p.c_str());
     if (dpdf != NULL){
         while (epdf = readdir(dpdf)){
@@ -142,12 +149,13 @@ int main(int argc, char *argv[])
     if (r) {
         reverse(filenames.begin(), filenames.end());
     }
-
+    basic_regex<char> mask = regex(charmask);
     for (int i = 0; i < filenames.size();i++) {
 
-        if (charmask != "*") {
-
-            if (regex_match(filenames[i].name, mask)) {
+        if (strcmp(charmask.c_str(), "*") != 0) {
+            string s(filenames[i].name);
+            //cout <<"s: "<< s << endl;
+            if (regex_match(s, mask)) {
                 if (l) {
                     cout << filenames[i].is_dir << filenames[i].name << "  " << filenames[i].size << " bytes  " << ctime(&filenames[i].lastmod)
                          << endl;
@@ -164,6 +172,7 @@ int main(int argc, char *argv[])
             }
         }
     }
+
     return 0;
 }
 

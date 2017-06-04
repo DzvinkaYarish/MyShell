@@ -6,10 +6,10 @@
 #include "callOuterCommands.h"
 #include "innerCommands.h"
 //! USE at least "export PATH=$PATH:`pwd`" or getenv()/setenv()
-//#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
+#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
 //! От якби Ви в змінній EXEC_PATH зберігали шлях при запуску -- вважаючи, що
 //! всі утиліти разом лежать, було б простіше.
-#define EXEC_PATH ""
+//#define EXEC_PATH ""
 
 int callOuter(std::vector<std::string> args)
 {
@@ -34,7 +34,7 @@ int callOuter(std::vector<std::string> args)
     expath += args[0];
     char * argv[args.size() + 1];
     for (int i = 0; i < args.size(); i++) {
-        argv[i] = (char *)malloc( args[i].size() + 1 ); //! <=== Що тут за 256 було?! 
+        argv[i] = (char *)malloc(256); //! <=== Що тут за 256 було?!
         strcpy(argv[i], args[i].c_str());
     }
     strcpy(argv[0], expath.c_str());
