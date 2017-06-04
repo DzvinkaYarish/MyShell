@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
     path curpth = current_path();
     for (int i = 1; i < argc; i++)
     {
+        string curarg(argv[i]);
         if (strcmp(argv[i], "-l") == 0)
         {
             l = true;
@@ -97,6 +98,14 @@ int main(int argc, char *argv[])
             p = (path)argv[i];
             curpth = p;
             cout << p << endl;
+        } else if (curarg.find("<") != -1)
+        {
+            redirect = true;
+            if (curarg.size() < 3)
+            {
+                curarg += string(argv[i + 1]);
+            }
+            redirctOptions.push_back(curarg);
         } else
         {
             charmask = argv[i];
@@ -148,6 +157,12 @@ int main(int argc, char *argv[])
     sort(filenames.begin(), filenames.end(), cmpMap[sortm]);
     if (r) {
         reverse(filenames.begin(), filenames.end());
+    }
+    if (redirect)
+    {
+
+        
+
     }
     basic_regex<char> mask = regex(charmask);
     for (int i = 0; i < filenames.size();i++) {
