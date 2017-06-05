@@ -9,6 +9,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <regex>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 using namespace std;
@@ -74,6 +77,7 @@ int main(int argc, char *argv[])
     bool l = false;
     bool r = false;
     bool redirect = false;
+    int fd = -1;
     vector<string> redirctOptions;
     string sortm = "sort=N";
     string charmask("*");
@@ -98,28 +102,28 @@ int main(int argc, char *argv[])
             p = (path)argv[i];
             curpth = p;
             cout << p << endl;
-        } else if (curarg.find("<") != -1)
+        } else if (curarg.find(">") != -1)
         {
+            cout << "redirect" << endl;
             redirect = true;
             if (curarg.size() < 3)
             {
-                curarg += string(argv[i + 1]);
+                curarg += " " + string(argv[i + 1]);
+                i++;
             }
             redirctOptions.push_back(curarg);
         } else
         {
             charmask = argv[i];
-
+            cout << "charmask" << endl;
         }
     }
 
-
     vector<fileinfo> filenames;
-
 
     DIR *dpdf;
     struct dirent *epdf;
-    cout << "myls1" << endl;
+    //cout << "myls1" << endl;
     dpdf = opendir(p.c_str());
     if (dpdf != NULL){
         while (epdf = readdir(dpdf)){
@@ -144,12 +148,27 @@ int main(int argc, char *argv[])
                     filenames.push_back(temp);
                     continue;
                 }
+                int k = 0, flg = 0;
+                while(epdf->d_name[k])
+                {
+                    if(epdf->d_name[k] == '.')
+                    {
+                        flg = 1;
+                        break;
+                    }
+                    k++;
+                }
+                if(flg) {
+                    split(splitVec, epdf->d_name, boost::is_any_of("."), boost::token_compress_on);
+                    temp.extens = splitVec[1];
 
-                split(splitVec, epdf->d_name, boost::is_any_of("."), boost::token_compress_on);
-                temp.extens = splitVec[1];
+                } else
+                {
+                    temp.extens = "";
+
+                }
                 temp.is_dir = "";
                 filenames.push_back(temp);
-
             }
         }
     }
@@ -160,8 +179,46 @@ int main(int argc, char *argv[])
     }
     if (redirect)
     {
+        for(string redopt: redirctOptions)
+        {
+            cout <<"redopt: " <<redopt << endl;
+            if(redopt.find(" ") != -1)
+            {
+                vector<string> splitVec;
+                boost::split(splitVec, redopt, boost::is_any_of(" "), boost::token_compress_on);
+                string tofile = curpth.string() + "/" + splitVec[1];
+                if ((fd = open(tofile.c_str(), O_RDWR | O_CREAT | O_APPEND)) == -1) {
+                    cout << "error creating a file: " <<strerror(errno) <<endl;
+                    return -1;
+                }
+                if (redopt[0] == '2')
+                {
+                    dup2(fd, 2);
 
-        
+
+                } else
+                {
+                    cout << "stdout" << endl;
+                    dup2(fd, 1);
+
+
+                }
+
+
+            } else
+            {
+                if(redopt[0] == '2')
+                {
+                    dup2(redopt[redopt.size() - 1], 2);
+                    //close(redopt[redopt.size() - 1]);
+                } else
+                {
+                    dup2(redopt[redopt.size() - 1], 1);
+                    //close(redopt[redopt.size() - 1]);
+                }
+            }
+        }
+
 
     }
     basic_regex<char> mask = regex(charmask);
@@ -169,7 +226,6 @@ int main(int argc, char *argv[])
 
         if (strcmp(charmask.c_str(), "*") != 0) {
             string s(filenames[i].name);
-            //cout <<"s: "<< s << endl;
             if (regex_match(s, mask)) {
                 if (l) {
                     cout << filenames[i].is_dir << filenames[i].name << "  " << filenames[i].size << " bytes  " << ctime(&filenames[i].lastmod)
@@ -183,11 +239,16 @@ int main(int argc, char *argv[])
             if (l) {
                 cout << filenames[i].is_dir << filenames[i].name << "  " << filenames[i].size << " bytes  " << ctime(&filenames[i].lastmod) << endl;
             } else {
+
                 cout << filenames[i].is_dir << filenames[i].name << endl;
             }
         }
     }
 
+    if(fd != -1)
+    {
+        close(fd);
+    }
     return 0;
 }
 
