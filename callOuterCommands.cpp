@@ -8,7 +8,7 @@
 #include "innerCommands.h"
 #include "constants.cpp"
 //! USE at least "export PATH=$PATH:`pwd`" or getenv()/setenv()
-//#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
+#define EXEC_PATH "/home/dzvinka/CLionProjects/MyShell/cmake-build-debug/"
 //! От якби Ви в змінній EXEC_PATH зберігали шлях при запуску -- вважаючи, що
 //! всі утиліти разом лежать, було б простіше.
 //#define EXEC_PATH ""
