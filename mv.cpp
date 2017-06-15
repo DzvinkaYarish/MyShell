@@ -23,13 +23,28 @@ boost::filesystem::path concat(boost::filesystem::path pp, char c[])
 
 int main(int argc, char *argv[]) {
 
+    if (argc < 3)
+    {
+        std::cout << "mv: missing operand" << std::endl;
+        return  -1;
+    }
+    
     errno = 0;
     string userInput;
     bool f = false;
 
     int indxoff = -1;
-    for (int i  = 0; i < argc; i++) {
-        if (strcmp(argv[i], "-f") == 0) {
+    for (int i  = 0; i < argc; i++) { 
+        if (strcmp(argv[i], "-h") == 0 ||strcmp(argv[i], "--help") == 0)
+        {
+            cout << "Usage: mv [OPTION]... SOURCE DEST\n"
+                    "  or:  mv [OPTION]... SOURCE... DIRECTORY\n"
+                    "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.\n"
+                    "-f,       do not prompt before overwriting\n"
+                    " -h, -help     display this help and exit" << endl;
+            return 0;
+        }
+        else if (strcmp(argv[i], "-f") == 0) {
             f = true;
             indxoff = i;
             break;

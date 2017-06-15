@@ -11,9 +11,16 @@ int cd(std::vector<std::string> args)
 /// cd ~ - home dir
 /// cd .. - one dir up
 
-
-    if (displayHelp(args)) {
-        return 0;
+    for (int i = 0; i < args.size(); i++)
+    {
+        if (strcmp(args[i].c_str(), "-h") == 0 ||strcmp(args[i].c_str(), "--help") == 0)
+        {
+            std::cout << "Change to the DIRECTORY if exists\n"
+                    "~, [space]    change to the home directory\n"
+                    "..            go one directory up\n"
+                    "-h, --help    display this help" << std::endl;
+            return 0;
+        }
     }
 
     if (args.size() == 1 || args[1] == "~")
@@ -69,8 +76,14 @@ int cd(std::vector<std::string> args)
 
 int pwd(std::vector<std::string> args)
 {
-    if (displayHelp(args)) {
-        return 0;
+    for (int i = 0; i < args.size(); i++)
+    {
+        if(strcmp(args[i].c_str(), "-h") == 0 ||strcmp(args[i].c_str(), "--help") == 0)
+        {
+            std::cout << "Show current working directory\n"
+                    "-h, --help    display this help" << std::endl;
+            return 0;
+        }
     }
 
     if (args.size() == 1)
@@ -83,48 +96,18 @@ int pwd(std::vector<std::string> args)
     return 0;
 }
 
-bool displayHelp(std::vector<std::string> args)
+
+
+int setVariable(std::string name, std::string value, std::map<std::string, std::string> &varMap)
 {
-    std::map<std::string, std::string> helpMap;
-    helpMap["pwd"] = "Show current working directory\n"
-            "-h, --help    display this help";
-    helpMap["cd"] = "Change to the DIRECTORY if exists\n"
-            "~, [space]    change to the home directory\n"
-            "..            go one directory up\n"
-            "-h, --help    display this help";
-    helpMap["ls"] = "Usage: ls [OPTION]... [PATH|MASK]...\n"
-            "List information about the FILEs (the current directory by default).\n"
-            "Sort entries alphabetically if --sort is not specified.\n"
-            "-l                      use a long listing format\n"
-            " --sort=WORD            sort by WORD instead of name: none -U,\n"
-            "                        extension -X, size -S, time -t\n"
-            "-r, --reverse           reverse order while sorting\n"
-            "-help                   display this help and exit";
-    helpMap["mkdir"] = "Usage: mkdir [OPTION]... DIRECTORY...\n"
-            "Create the DIRECTORY(ies), if they do not already exist.\n"
-            "-h, --help     display this help and exit";
-    helpMap["cp"] =  "Usage: cp [OPTION]...  SOURCE DEST\n"
-            "  or:  cp [OPTION]... SOURCE... DIRECTORY\n"
-            "Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY."
-            "-f,       do not prompt before overwriting\n"
-            " -h, -help     display this help and exit";
-    helpMap["mv"] = "Usage: mv [OPTION]... SOURCE DEST\n"
-            "  or:  mv [OPTION]... SOURCE... DIRECTORY\n"
-            "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.\n"
-            "-f,       do not prompt before overwriting\n"
-            " -h, -help     display this help and exit";
-    helpMap["rm"] = "Usage: rm [OPTION]... FILES...\n"
-            "Remove (unlink) the FILE(s).\n"
-            " -f,           ignore nonexistent files and arguments, never prompt\n"
-            " -R   remove directories and their contents recursively\n"
-            " -h, --help     display this help and exit";
+    name = "$" + name;
+    //std::cout << value << std::endl;
+    varMap[name] = value;
+    return 0;
+}
 
-
-    if (find(args.begin(), args.end(), "-h") != args.end() || find(args.begin(), args.end(), "--help") != args.end())
-    {
-        std::cout << helpMap[args[0]] << std::endl;
-        return true;
-    }
-    return false;
+std::string getVariable(std::string name, std::map<std::string, std::string> &varMap)
+{
+    return varMap[name];
 }
 

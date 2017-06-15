@@ -23,7 +23,11 @@ path concat(path pp, char c[])
 int main(int argc, char *argv[])
 {
 
-
+    if (argc < 2) 
+    {
+        std::cout << "rm: missing operand" << std::endl;
+        return  -1;
+    }
     bool f = false;
     bool R = false;
 
@@ -35,6 +39,15 @@ int main(int argc, char *argv[])
         } else if (strcmp(argv[i], "-R") == 0)
         {
             R = true;
+
+        } else if (strcmp(argv[i], "-h") == 0 ||strcmp(argv[i], "--help") == 0) 
+        {
+            cout << "Usage: rm [OPTION]... FILES...\n"
+                    "Remove (unlink) the FILE(s).\n"
+                    " -f,           ignore nonexistent files and arguments, never prompt\n"
+                    " -R   remove directories and their contents recursively\n"
+                    " -h, --help     display this help and exit" << endl;
+            return 0;
 
         }
     }

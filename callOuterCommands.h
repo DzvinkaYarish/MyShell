@@ -18,8 +18,8 @@
 
 
 int callOuter(std::vector<std::string> args);
-int startNewProcess(char *  argv[]);
-
+int startNewProcess(char *  argv[], bool inbackground);
+int organizePipes(std::vector<std::string> args);
 
 
 

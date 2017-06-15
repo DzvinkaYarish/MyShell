@@ -68,6 +68,8 @@ path concat(path pp, char c[])
 
 int main(int argc, char *argv[])
 {
+    
+    cout <<"myls" << endl;
     cmpMap["sort=N"] = &cmpName;
     cmpMap["sort=S"] = &cmpSize;
     cmpMap["sort=t"] = &cmpDate;
@@ -88,7 +90,19 @@ int main(int argc, char *argv[])
     for (int i = 1; i < argc; i++)
     {
         string curarg(argv[i]);
-        if (strcmp(argv[i], "-l") == 0)
+        if(strcmp(argv[i], "-h") == 0 ||strcmp(argv[i], "--help") == 0)
+        {
+            cout << "Usage: ls [OPTION]... [PATH|MASK]...\n"
+                    "List information about the FILEs (the current directory by default).\n"
+                    "Sort entries alphabetically if --sort is not specified.\n"
+                    "-l                      use a long listing format\n"
+                    " --sort=WORD            sort by WORD instead of name: none -U,\n"
+                    "                        extension -X, size -S, time -t\n"
+                    "-r, --reverse           reverse order while sorting\n"
+                    "-help                   display this help and exit" << endl;
+            return 0;
+        }
+        else if (strcmp(argv[i], "-l") == 0)
         {
             l = true;
         } else if (strcmp(argv[i], "-r") == 0)
@@ -188,7 +202,7 @@ int main(int argc, char *argv[])
                 boost::split(splitVec, redopt, boost::is_any_of(" "), boost::token_compress_on);
                 string tofile = curpth.string() + "/" + splitVec[1];
                 if ((fd = open(tofile.c_str(), O_RDWR | O_CREAT | O_APPEND)) == -1) {
-                    cout << "error creating a file: " <<strerror(errno) <<endl;
+                    cout << "error creating a file: " << strerror(errno) <<endl;
                     return -1;
                 }
                 if (redopt[0] == '2')

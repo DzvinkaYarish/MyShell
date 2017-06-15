@@ -18,7 +18,9 @@
 
 int cd(std::vector<std::string> args);
 int pwd(std::vector<std::string> args);
-bool displayHelp(std::vector<std::string> args);
+int setVariable(std::string name, std::string value, std::map<std::string, std::string> &varMap);
+std::string getVariable(std::string name, std::map<std::string, std::string> &varMap);
+
 
 
 #endif //MYSHELL_INNERCOMMANDS_H
