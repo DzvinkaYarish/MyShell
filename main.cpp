@@ -13,6 +13,7 @@ using namespace std;   /// BBBBBBBBBBBAAADDDDD
 typedef int (* commandToExec)(vector<string> args);
 map<string, commandToExec> commandMap;
 map<string, string> varMap, envVarMap;
+string execPath;
 
 
 
@@ -73,7 +74,15 @@ int executeCommand(commandToExec commnd, vector<string> &args)
 
 int readScript(vector<string> args)
 {
-    fstream fin(args[1]); //full path to the file
+
+    string filename = args[1];
+    if (!(boost::algorithm::starts_with(filename, "/"))) {
+        filename = boost::filesystem::current_path().string() + "/" + filename;
+
+    }
+
+    bool isscript = false;
+    fstream fin(filename); //full path to the file
     if (!fin.is_open()) {
         cout << "error reading from file";
         return  -1;
@@ -82,7 +91,16 @@ int readScript(vector<string> args)
     string line;
 
     while (getline(fin, line)) {
-        cout << line << endl;
+        //cout << line << endl;
+        if (boost::algorithm::starts_with(line, "#!"))
+        {
+            isscript = true;
+        }
+        if (!isscript)
+        {
+            cout << "Not a myShell script" << endl;
+            return -1;
+        }
         vector<string> splitVec, splitVecWithoutComments;
         boost::split(splitVec, line, boost::is_space(), boost::token_compress_on);
         for (string s: splitVec) {
@@ -91,13 +109,25 @@ int readScript(vector<string> args)
             }
             splitVecWithoutComments.push_back(s);
         }
-        if(!splitVecWithoutComments.empty()) {
+        if (!splitVecWithoutComments.empty()) {
+            splitVecWithoutComments.push_back(execPath);
             if (splitVecWithoutComments[0] == "exit") {
                 break;
-            } else if (commandMap.find(splitVecWithoutComments[0]) != commandMap.end()) {
-                executeCommand(commandMap[splitVecWithoutComments[0]], splitVecWithoutComments);
             } else {
-                cout << splitVec[0] << ": command not found" << endl;
+                if(line.find("|") != string::npos)
+                {
+                    executeCommand(commandMap["pipeline"], splitVecWithoutComments);
+                }
+                else if (commandMap.find(splitVecWithoutComments[0]) != commandMap.end()) {
+
+                    executeCommand(commandMap[splitVecWithoutComments[0]], splitVecWithoutComments);
+
+                } else if (line.find("=") != string::npos)
+                {
+                    executeCommand(commandMap["assign"], splitVecWithoutComments);
+                } else {
+                    cout << splitVecWithoutComments[0] << ": command not found" << endl;
+                }
             }
         }
     }
@@ -106,7 +136,7 @@ int readScript(vector<string> args)
 
 
 
-int main()
+int main(int argc, char *argv[])
 {
     commandMap["echo"] = &echo;
     commandMap["export"] = &Export;
@@ -124,10 +154,27 @@ int main()
     commandMap["pipeline"] = &organizePipes;
     string userInput;
 
+    execPath = my_get_current_dir_name();
+
+    if (argc > 1)
+    {
+        vector<string> arg;
+        //arg.push_back("myshell");
+        for (int i = 0; i < argc; i++)
+        {
+            string s(argv[i]);
+            arg.push_back(s);
+        }
+        for (string s: arg)
+        {
+            cout << s << endl;
+        }
+        executeCommand(commandMap["myshell"], arg);
+    }
+
 
     while (1) {
         vector<string> splitVec, splitVecWithoutComments;
-		//! УВАГА -- див. комент до get_current_dir_name() в innerCommands.cpp 
         cout << my_get_current_dir_name() << "$ ";
         getline(cin, userInput);
         if(!userInput.empty()) {
@@ -139,23 +186,24 @@ int main()
                 splitVecWithoutComments.push_back(s);
             }
             if (!splitVecWithoutComments.empty()) {
+                splitVecWithoutComments.push_back(execPath);
                 if (splitVecWithoutComments[0] == "exit") {
                     break;
                 } else {
-                    if (std::find(splitVecWithoutComments.begin(), splitVecWithoutComments.end(), "|") != splitVecWithoutComments.end()) 
+                    //if (std::find(splitVecWithoutComments.begin(), splitVecWithoutComments.end(), "|") != splitVecWithoutComments.end())
+                    if(userInput.find("|") != string::npos)
                     {
                         executeCommand(commandMap["pipeline"], splitVecWithoutComments);
                     }
                     else if (commandMap.find(splitVecWithoutComments[0]) != commandMap.end()) {
 
                         executeCommand(commandMap[splitVecWithoutComments[0]], splitVecWithoutComments);
+
+                    } else if (userInput.find("=") != string::npos)
+                    {
+                        executeCommand(commandMap["assign"], splitVecWithoutComments);
                     } else {
-                        if (userInput.find("=") != string::npos)
-                        {
-                            executeCommand(commandMap["assign"], splitVecWithoutComments);
-                        } else {
-                            cout << splitVecWithoutComments[0] << ": command not found" << endl;
-                        }
+                        cout << splitVecWithoutComments[0] << ": command not found" << endl;
                     }
                 }
             }

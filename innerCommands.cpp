@@ -11,6 +11,8 @@ int cd(std::vector<std::string> args)
 /// cd ~ - home dir
 /// cd .. - one dir up
 
+
+    args.erase(args.begin() + (args.size() - 1));
     for (int i = 0; i < args.size(); i++)
     {
         if (strcmp(args[i].c_str(), "-h") == 0 ||strcmp(args[i].c_str(), "--help") == 0)
@@ -76,6 +78,7 @@ int cd(std::vector<std::string> args)
 
 int pwd(std::vector<std::string> args)
 {
+    args.erase(args.begin() + (args.size() - 1));
     for (int i = 0; i < args.size(); i++)
     {
         if(strcmp(args[i].c_str(), "-h") == 0 ||strcmp(args[i].c_str(), "--help") == 0)

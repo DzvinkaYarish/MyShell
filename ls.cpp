@@ -69,7 +69,7 @@ path concat(path pp, char c[])
 int main(int argc, char *argv[])
 {
     
-    cout <<"myls" << endl;
+    //cout <<"myls" << endl;
     cmpMap["sort=N"] = &cmpName;
     cmpMap["sort=S"] = &cmpSize;
     cmpMap["sort=t"] = &cmpDate;
@@ -78,7 +78,8 @@ int main(int argc, char *argv[])
 
     bool l = false;
     bool r = false;
-    bool redirect = false;
+    bool redirect_o = false;
+    bool pipe = false;
     int fd = -1;
     vector<string> redirctOptions;
     string sortm = "sort=N";
@@ -105,7 +106,10 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "-l") == 0)
         {
             l = true;
-        } else if (strcmp(argv[i], "-r") == 0)
+        }
+        else if (strcmp(argv[i], "pipe") == 0) {
+            pipe = true;
+        }else if (strcmp(argv[i], "-r") == 0)
         {
             r = true;
         } else if (boost::algorithm::starts_with(argv[i], "sort"))
@@ -115,11 +119,11 @@ int main(int argc, char *argv[])
         {
             p = (path)argv[i];
             curpth = p;
-            cout << p << endl;
+
         } else if (curarg.find(">") != -1)
         {
-            cout << "redirect" << endl;
-            redirect = true;
+            //cout << "redirect" << endl;
+            redirect_o = true;
             if (curarg.size() < 3)
             {
                 curarg += " " + string(argv[i + 1]);
@@ -129,7 +133,7 @@ int main(int argc, char *argv[])
         } else
         {
             charmask = argv[i];
-            cout << "charmask" << endl;
+            //cout << "charmask" << endl;
         }
     }
 
@@ -191,7 +195,8 @@ int main(int argc, char *argv[])
     if (r) {
         reverse(filenames.begin(), filenames.end());
     }
-    if (redirect)
+
+    if (redirect_o)
     {
         for(string redopt: redirctOptions)
         {
@@ -201,33 +206,40 @@ int main(int argc, char *argv[])
                 vector<string> splitVec;
                 boost::split(splitVec, redopt, boost::is_any_of(" "), boost::token_compress_on);
                 string tofile = curpth.string() + "/" + splitVec[1];
-                if ((fd = open(tofile.c_str(), O_RDWR | O_CREAT | O_APPEND)) == -1) {
+                if ((fd = open(tofile.c_str(), O_RDWR | O_CREAT)) == -1) {
                     cout << "error creating a file: " << strerror(errno) <<endl;
                     return -1;
                 }
                 if (redopt[0] == '2')
                 {
-                    dup2(fd, 2);
+                    if (dup2(fd, 2) == -1)
+                    {
+                        exit(-1);
+                    };
 
 
                 } else
                 {
-                    cout << "stdout" << endl;
-                    dup2(fd, 1);
-
-
+                    if(dup2(fd, 1) == -1) 
+                    {
+                        exit(-1);
+                    };
                 }
-
-
             } else
             {
                 if(redopt[0] == '2')
                 {
-                    dup2(redopt[redopt.size() - 1], 2);
+                    if (dup2(redopt[redopt.size() - 1], 2) == -1) 
+                    {
+                        exit(-1);
+                    };
                     //close(redopt[redopt.size() - 1]);
                 } else
                 {
-                    dup2(redopt[redopt.size() - 1], 1);
+                    if(dup2(redopt[redopt.size() - 1], 1) == -1) 
+                    {
+                        exit(-1);
+                    };
                     //close(redopt[redopt.size() - 1]);
                 }
             }
@@ -235,6 +247,7 @@ int main(int argc, char *argv[])
 
 
     }
+
     basic_regex<char> mask = regex(charmask);
     for (int i = 0; i < filenames.size();i++) {
 
@@ -259,10 +272,12 @@ int main(int argc, char *argv[])
         }
     }
 
+
     if(fd != -1)
     {
         close(fd);
     }
+
     return 0;
 }
 
